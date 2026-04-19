@@ -1,32 +1,32 @@
 """Pydantic models for request/response validation and serialization."""
 
-from pydantic import BaseModel, Field, field_validator
-from typing import Optional
+from pydantic import BaseModel, Field, validator
+from typing import Optional, List
 
 
 class IntelligencePoint(BaseModel):
     """Schema for a single intelligence data point."""
 
-    title: str = Field(..., min_length=1, max_length=256, description="Title of the intelligence point")
-    description: str = Field(..., min_length=1, max_length=2048, description="Description of the observation")
-    lat: float = Field(..., ge=-90, le=90, description="Latitude coordinate")
-    lon: float = Field(..., ge=-180, le=180, description="Longitude coordinate")
-    image: str = Field(..., min_length=1, description="Image filename or URL")
+    title: str = Field(..., min_length=1, max_length=256)
+    description: str = Field(..., min_length=1, max_length=2048)
+    lat: float = Field(..., ge=-90, le=90)
+    lon: float = Field(..., ge=-180, le=180)
+    image: str = Field(..., min_length=1)
 
-    @field_validator("title", "description", "image")
-    @classmethod
-    def strip_whitespace(cls, v: str) -> str:
+    @validator("title", "description", "image")
+    def strip_whitespace(cls, v):
         return v.strip()
 
-    model_config = {"json_schema_extra": {
-        "example": {
-            "title": "Suspicious Activity Report",
-            "description": "Unidentified vessel spotted near port at 0300 hours.",
-            "lat": 34.0522,
-            "lon": -118.2437,
-            "image": "vessel_001.jpg",
+    class Config:
+        schema_extra = {
+            "example": {
+                "title": "Suspicious Activity Report",
+                "description": "Unidentified vessel spotted near port at 0300 hours.",
+                "lat": 34.0522,
+                "lon": -118.2437,
+                "image": "vessel_001.jpg",
+            }
         }
-    }}
 
 
 class IntelligencePointResponse(BaseModel):
@@ -34,7 +34,7 @@ class IntelligencePointResponse(BaseModel):
 
     status: str = "success"
     count: int
-    data: list[IntelligencePoint]
+    data: List[IntelligencePoint]
 
 
 class UploadResponse(BaseModel):
