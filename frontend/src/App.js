@@ -3,21 +3,20 @@ import axios from 'axios';
 import Sidebar from './components/Sidebar';
 import MapView from './components/MapView';
 
-const API_BASE = 'http://127.0.0.1:8000';
-
 export default function App() {
   const [markers, setMarkers] = useState([]);
 
   const fetchMarkers = useCallback(async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/markers")
-      setMarkers(res.data?.data || []);
+      const res = await axios.get(
+        "https://multi-source-intelligence-fusion-amx6.onrender.com/api/markers"
+      );
+      setMarkers(res.data.data); // clean, no optional chaining needed now
     } catch (err) {
       console.error('Failed to fetch markers:', err);
     }
   }, []);
 
-  // Fetch on mount
   useEffect(() => {
     fetchMarkers();
   }, [fetchMarkers]);
