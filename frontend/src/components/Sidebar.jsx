@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 
-const API_BASE = 'https://multi-source-intelligence-fusion-amx6.onrender.com';
+const API_BASE = process.env.REACT_APP_API_BASE_URL || 'https://multi-source-intelligence-fusion-amx6.onrender.com';
 
 export default function Sidebar({ markerCount, onDataUploaded }) {
   const [dataFile, setDataFile] = useState(null);

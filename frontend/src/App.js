@@ -8,9 +8,8 @@ export default function App() {
 
   const fetchMarkers = useCallback(async () => {
     try {
-      const res = await axios.get(
-        "https://multi-source-intelligence-fusion-amx6.onrender.com/api/markers"
-      );
+      const API_BASE = process.env.REACT_APP_API_BASE_URL || "https://multi-source-intelligence-fusion-amx6.onrender.com";
+      const res = await axios.get(`${API_BASE}/api/markers`);
       setMarkers(res.data.data);
     } catch (err) {
       console.error('Failed to fetch markers:', err);
