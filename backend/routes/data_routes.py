@@ -30,9 +30,27 @@ async def upload_data(file: UploadFile = File(..., description="CSV or JSON file
     filename = (file.filename or "").lower()
     logger.info("Received data upload: %s (content_type=%s)", file.filename, file.content_type)
 
-    # Read file content
+    # Read raw bytes
+    raw = await file.read()
+
+    # ── Debug: confirm what actually arrived ──────────────────────────────
+    logger.info(
+        "DEBUG FILE RECEIPT — filename=%s | content_type=%s | bytes=%d | preview=%.200s",
+        file.filename,
+        file.content_type,
+        len(raw),
+        raw[:200].decode("utf-8", errors="replace"),
+    )
+
+    if len(raw) == 0:
+        logger.error("EMPTY FILE RECEIVED — the upload body was 0 bytes")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Received an empty file. Ensure the file is attached correctly.",
+        )
+
+    # Decode to string
     try:
-        raw = await file.read()
         content = raw.decode("utf-8")
     except UnicodeDecodeError:
         logger.error("Failed to decode file as UTF-8: %s", file.filename)

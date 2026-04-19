@@ -11,6 +11,15 @@ DATA_DIR = BASE_DIR / "data"
 IMAGES_DIR = BASE_DIR / "images"
 DATA_FILE = DATA_DIR / "data.json"
 
+# Log resolved path at import time (visible on Render startup)
+_init_logger = logging.getLogger("helpers.init")
+_init_logger.setLevel(logging.INFO)
+if not _init_logger.handlers:
+    _h = logging.StreamHandler()
+    _h.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"))
+    _init_logger.addHandler(_h)
+_init_logger.info("DATA_FILE resolved to: %s", DATA_FILE)
+
 
 def ensure_directories() -> None:
     """Create required directories if they don't exist."""
@@ -45,19 +54,24 @@ def generate_unique_filename(original_filename: str) -> str:
 
 def read_json_store() -> list[dict]:
     """Read and return the current data store contents."""
+    logger = get_logger("helpers.io")
     try:
         raw = DATA_FILE.read_text(encoding="utf-8")
         data = json.loads(raw)
         if not isinstance(data, list):
+            logger.warning("data.json is not a list — returning empty")
             return []
+        logger.info("READ %s — %d record(s), %d bytes", DATA_FILE, len(data), len(raw))
         return data
-    except (json.JSONDecodeError, FileNotFoundError):
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        logger.error("Failed to read %s: %s", DATA_FILE, e)
         return []
 
 
 def write_json_store(data: list[dict]) -> None:
-    """Write data to the JSON store atomically (overwrite)."""
-    DATA_FILE.write_text(
-        json.dumps(data, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
+    """Write data to the JSON store (overwrite)."""
+    logger = get_logger("helpers.io")
+    content = json.dumps(data, indent=2, ensure_ascii=False)
+    DATA_FILE.write_text(content, encoding="utf-8")
+    logger.info("WROTE %s — %d record(s), %d bytes", DATA_FILE, len(data), len(content))
+

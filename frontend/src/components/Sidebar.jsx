@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = 'https://multi-source-intelligence-fusion-amx6.onrender.com';
 
 export default function Sidebar({ markerCount, onDataUploaded }) {
   const [dataFile, setDataFile] = useState(null);
@@ -26,10 +26,10 @@ export default function Sidebar({ markerCount, onDataUploaded }) {
     const formData = new FormData();
     formData.append('file', dataFile);
 
+    console.log('[Upload] Sending data file:', dataFile.name, 'size:', dataFile.size);
+
     try {
-      const res = await axios.post(`${API_BASE}/api/upload-data`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const res = await axios.post(`${API_BASE}/api/upload-data`, formData);
       showToast('success', res.data.message || 'Data uploaded successfully.');
       setDataFile(null);
       if (dataInputRef.current) dataInputRef.current.value = '';
@@ -54,10 +54,10 @@ export default function Sidebar({ markerCount, onDataUploaded }) {
     const formData = new FormData();
     formData.append('file', imageFile);
 
+    console.log('[Upload] Sending image file:', imageFile.name, 'size:', imageFile.size);
+
     try {
-      const res = await axios.post(`${API_BASE}/api/upload-image`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const res = await axios.post(`${API_BASE}/api/upload-image`, formData);
       showToast('success', `Image saved: ${res.data.filename}`);
       setImageFile(null);
       if (imageInputRef.current) imageInputRef.current.value = '';
