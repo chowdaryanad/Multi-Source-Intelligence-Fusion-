@@ -17,11 +17,11 @@ const customIcon = new L.DivIcon({
   html: `
     <div style="
       width: 28px; height: 28px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      background: linear-gradient(135deg, #0ea5e9, #3b82f6);
       border: 2.5px solid rgba(255,255,255,0.9);
       border-radius: 50% 50% 50% 4px;
       transform: rotate(-45deg);
-      box-shadow: 0 3px 12px rgba(59,130,246,0.5);
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
       display: flex; align-items: center; justify-content: center;
     ">
       <div style="
@@ -33,11 +33,11 @@ const customIcon = new L.DivIcon({
     </div>
   `,
   iconSize: [28, 28],
-  iconAnchor: [4, 28],
-  popupAnchor: [12, -24],
+  iconAnchor: [14, 28],
+  popupAnchor: [0, -28],
 });
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = 'https://multi-source-intelligence-fusion-amx6.onrender.com';
 
 // Center: India
 const DEFAULT_CENTER = [22.5, 78.9];
@@ -61,11 +61,11 @@ export default function MapView({ markers }) {
   const [mapReady, setMapReady] = useState(false);
 
   return (
-    <div className="map-container">
+    <div className="map-wrapper">
       {!mapReady && (
-        <div className="map-loading">
-          <div className="map-loading-spinner" />
-          <span className="map-loading-text">Initializing map…</span>
+        <div className="map-card-loading">
+          <div className="spinner" />
+          <span>Initializing Map...</span>
         </div>
       )}
 
@@ -74,11 +74,11 @@ export default function MapView({ markers }) {
         zoom={DEFAULT_ZOOM}
         zoomControl={true}
         whenReady={() => setMapReady(true)}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', background: 'transparent' }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
 
         {markers.length > 0 && <FitBounds markers={markers} />}
@@ -93,7 +93,7 @@ export default function MapView({ markers }) {
               <div className="popup-card">
                 {point.image && (
                   <img
-                    className="popup-image"
+                    className="popup-img"
                     src={
                       point.image.startsWith('http')
                         ? point.image
@@ -106,12 +106,12 @@ export default function MapView({ markers }) {
                   />
                 )}
 
-                <div className="popup-body">
+                <div className="popup-info">
                   <div className="popup-title">{point.title}</div>
                   <div className="popup-desc">{point.description}</div>
-                  <div className="popup-coords">
-                    <span>LAT {point.lat.toFixed(4)}</span>
-                    <span>LON {point.lon.toFixed(4)}</span>
+                  <div className="popup-coords-wrapper">
+                    <span className="popup-coord">LAT {point.lat.toFixed(4)}</span>
+                    <span className="popup-coord">LON {point.lon.toFixed(4)}</span>
                   </div>
                 </div>
               </div>

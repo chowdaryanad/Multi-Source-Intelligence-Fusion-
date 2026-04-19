@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 
 const API_BASE = 'https://multi-source-intelligence-fusion-amx6.onrender.com';
@@ -6,17 +6,32 @@ const API_BASE = 'https://multi-source-intelligence-fusion-amx6.onrender.com';
 export default function Sidebar({ markerCount, onDataUploaded }) {
   const [dataFile, setDataFile] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState({ data: false, image: false });
-  const [toast, setToast] = useState(null);
+  const [toasts, setToasts] = useState([]);
 
   const dataInputRef = useRef(null);
   const imageInputRef = useRef(null);
 
   // ── Toast helper ────────────────────────────────────────────────
   const showToast = (type, message) => {
-    setToast({ type, message });
-    setTimeout(() => setToast(null), 4000);
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, type, message }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4000);
   };
+
+  // ── Image Preview Effect ────────────────────────────────────────
+  useEffect(() => {
+    if (!imageFile) {
+      setImagePreview(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(imageFile);
+    setImagePreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [imageFile]);
 
   // ── Upload data file ────────────────────────────────────────────
   const handleDataUpload = async () => {
@@ -72,46 +87,31 @@ export default function Sidebar({ markerCount, onDataUploaded }) {
 
   return (
     <aside className="sidebar">
-      {/* ── Header ──────────────────────────────────────────────── */}
-      <div className="sidebar-header">
-        <div className="sidebar-brand">
-          <div className="brand-icon">⚡</div>
-          <div className="brand-text">
-            <h1>Fusion Dashboard</h1>
-            <span>Intelligence Platform</span>
-          </div>
-        </div>
-
-        <div className="status-bar">
-          <div className="status-dot" />
-          <span className="status-text">System Operational</span>
-        </div>
-      </div>
-
       {/* ── Upload Sections ─────────────────────────────────────── */}
       <div className="sidebar-content">
 
         {/* Data Upload */}
         <div className="section">
-          <span className="section-label">Intelligence Data</span>
-
-          <div className={`drop-zone ${dataFile ? 'has-file' : ''}`}>
+          <span className="section-title">Intelligence Data</span>
+          <div className={`upload-card ${dataFile ? 'has-file' : ''}`}>
             <input
               ref={dataInputRef}
               type="file"
               accept=".json,.csv"
               onChange={(e) => setDataFile(e.target.files?.[0] || null)}
+              className="upload-input"
               id="data-file-input"
             />
-            <div className="drop-zone-icon">📄</div>
-            <div className="drop-zone-text">
+            <div className="upload-icon">📄</div>
+            <div className="upload-text">
               <strong>Choose file</strong> or drag here
+              <br />
+              <span style={{ fontSize: '11px' }}>JSON or CSV format</span>
             </div>
-            <div className="drop-zone-hint">JSON or CSV format</div>
           </div>
 
           {dataFile && (
-            <div className="file-name">
+            <div className="file-pill">
               <span>📎</span>
               {dataFile.name}
             </div>
@@ -125,7 +125,7 @@ export default function Sidebar({ markerCount, onDataUploaded }) {
           >
             {uploading.data ? (
               <>
-                <div className="btn-spinner" />
+                <div className="spinner" />
                 Uploading…
               </>
             ) : (
@@ -136,25 +136,30 @@ export default function Sidebar({ markerCount, onDataUploaded }) {
 
         {/* Image Upload */}
         <div className="section">
-          <span className="section-label">Image Asset</span>
-
-          <div className={`drop-zone ${imageFile ? 'has-file' : ''}`}>
+          <span className="section-title">Image Asset</span>
+          <div className={`upload-card ${imageFile ? 'has-file' : ''}`}>
             <input
               ref={imageInputRef}
               type="file"
               accept=".jpg,.jpeg"
               onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+              className="upload-input"
               id="image-file-input"
             />
-            <div className="drop-zone-icon">🖼️</div>
-            <div className="drop-zone-text">
+            <div className="upload-icon">🖼️</div>
+            <div className="upload-text">
               <strong>Choose image</strong> or drag here
+              <br />
+              <span style={{ fontSize: '11px' }}>JPG / JPEG only</span>
             </div>
-            <div className="drop-zone-hint">JPG / JPEG only</div>
           </div>
 
-          {imageFile && (
-            <div className="file-name">
+          {imagePreview && (
+            <img src={imagePreview} alt="Preview" className="preview-thumb" />
+          )}
+
+          {imageFile && !imagePreview && (
+            <div className="file-pill">
               <span>📎</span>
               {imageFile.name}
             </div>
@@ -168,7 +173,7 @@ export default function Sidebar({ markerCount, onDataUploaded }) {
           >
             {uploading.image ? (
               <>
-                <div className="btn-spinner" />
+                <div className="spinner" />
                 Uploading…
               </>
             ) : (
@@ -176,22 +181,23 @@ export default function Sidebar({ markerCount, onDataUploaded }) {
             )}
           </button>
         </div>
-
-        {/* Toast */}
-        {toast && (
-          <div className={`toast toast-${toast.type}`}>
-            <span>{toast.type === 'success' ? '✓' : '✕'}</span>
-            {toast.message}
-          </div>
-        )}
       </div>
 
       {/* ── Footer ──────────────────────────────────────────────── */}
       <div className="sidebar-footer">
-        <div className="marker-count">
-          <span className="marker-count-label">Active Markers</span>
-          <span className="marker-count-value">{markerCount}</span>
+        <div className="stat-box">
+          <span className="stat-label">Active Markers</span>
+          <span className="stat-value">{markerCount}</span>
         </div>
+      </div>
+
+      {/* ── Toasts ──────────────────────────────────────────────── */}
+      <div className="toast-container">
+        {toasts.map((toast) => (
+          <div key={toast.id} className={`toast ${toast.type}`}>
+            {toast.message}
+          </div>
+        ))}
       </div>
     </aside>
   );
