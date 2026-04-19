@@ -2,9 +2,9 @@
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 
-from models.schemas import ErrorResponse, ImageUploadResponse
-from services.image_service import ImageService
-from utils.helpers import get_logger
+from backend.models.schemas import ErrorResponse, ImageUploadResponse
+from backend.services.image_service import ImageService
+from backend.utils.helpers import get_logger
 
 logger = get_logger(__name__)
 

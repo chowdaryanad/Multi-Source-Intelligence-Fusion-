@@ -7,8 +7,8 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from models.schemas import IntelligencePoint
-from utils.helpers import get_logger, read_json_store, write_json_store
+from backend.models.schemas import IntelligencePoint
+from backend.utils.helpers import get_logger, read_json_store, write_json_store
 
 logger = get_logger(__name__)
 

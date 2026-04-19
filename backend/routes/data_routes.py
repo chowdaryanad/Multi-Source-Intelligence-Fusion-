@@ -4,9 +4,9 @@ import json
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 
-from models.schemas import ErrorResponse, IntelligencePointResponse, UploadResponse
-from services.data_service import DataService
-from utils.helpers import get_logger
+from backend.models.schemas import ErrorResponse, IntelligencePointResponse, UploadResponse
+from backend.services.data_service import DataService
+from backend.utils.helpers import get_logger
 
 logger = get_logger(__name__)
 

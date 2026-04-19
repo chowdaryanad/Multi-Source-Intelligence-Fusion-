@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fastapi import UploadFile
 
-from utils.helpers import IMAGES_DIR, generate_unique_filename, get_logger
+from backend.utils.helpers import IMAGES_DIR, generate_unique_filename, get_logger
 
 logger = get_logger(__name__)
 
