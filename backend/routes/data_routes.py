@@ -49,9 +49,9 @@ async def upload_data(file: UploadFile = File(..., description="CSV or JSON file
             detail="Received an empty file. Ensure the file is attached correctly.",
         )
 
-    # Decode to string
+    # Decode to string (utf-8-sig strips BOM from Windows-encoded files)
     try:
-        content = raw.decode("utf-8")
+        content = raw.decode("utf-8-sig")
     except UnicodeDecodeError:
         logger.error("Failed to decode file as UTF-8: %s", file.filename)
         raise HTTPException(
