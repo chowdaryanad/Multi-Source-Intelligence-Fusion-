@@ -13,8 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from routes import data_router, image_router
-from utils.helpers import IMAGES_DIR, ensure_directories, get_logger
+from backend.routes import data_router, image_router
+from backend.utils.helpers import IMAGES_DIR, ensure_directories, get_logger
 
 logger = get_logger("main")
 
